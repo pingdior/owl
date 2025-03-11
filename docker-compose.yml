@@ -1,0 +1,52 @@
+services:
+  owl:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # 构建参数
+        BUILDKIT_INLINE_CACHE: 1
+      # 使用BuildKit加速构建
+      cache_from:
+        - python:3.10-slim
+    volumes:
+      # 挂载.env文件，方便配置API密钥
+      - ./owl/.env:/app/owl/.env
+      # 可选：挂载数据目录
+      - ./data:/app/data
+      # 挂载缓存目录，避免重复下载
+      - playwright-cache:/root/.cache/ms-playwright
+      - pip-cache:/root/.pip/cache
+    environment:
+      # 可以在这里设置环境变量，覆盖.env文件中的设置
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # 添加显示相关的环境变量
+      - DISPLAY=:99
+      - PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright
+      # 设置Python不生成.pyc文件，减少磁盘IO
+      - PYTHONDONTWRITEBYTECODE=1
+      # 设置Python不缓冲输出，方便查看日志
+      - PYTHONUNBUFFERED=1
+      # 设置终端颜色
+      - TERM=xterm-256color
+      # 启用pip缓存
+      - PIP_CACHE_DIR=/root/.pip/cache
+    ports:
+      # 如果项目有Web界面，可以映射端口
+      - "8000:8000"
+    # 使用交互模式运行容器
+    stdin_open: true
+    tty: true
+    # 添加共享内存大小，提高浏览器性能
+    shm_size: 2gb
+    # 设置资源限制
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+
+# 定义持久化卷，用于缓存
+volumes:
+  playwright-cache:
+  pip-cache: 

@@ -1,0 +1,12 @@
+# 环境变量和密钥文件
+.env
+**/.env
+owl/.env
+owl/.env_template
+
+# 其他敏感文件
+secrets.txt
+**/*_key*
+**/*_KEY*
+**/api_key*
+**/API_KEY*
